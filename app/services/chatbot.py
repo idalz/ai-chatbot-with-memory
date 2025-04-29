@@ -1,6 +1,6 @@
 from langchain_openai import ChatOpenAI
 from app.core.config import settings
-from app.services.memory_store import add_message_to_session, get_relevant_session_memories
+from app.services.session_memory import add_message_to_session, get_relevant_session_memories
 
 
 llm = ChatOpenAI(
@@ -12,12 +12,21 @@ llm = ChatOpenAI(
 def get_llm_response(session_id: str, user_message: str) -> str:
     # Get relevant memories for this session 
     memories = get_relevant_session_memories(session_id, user_message)
+    memory_text = "\n".join(memories)
 
     # Build prompt
-    context = "\n".join(memories)
-    prompt = f"Past memories:\n{context}\n\nUser: {user_message}" 
+    prompt = f"""
+    You are a helpful assistant. Use the following past interactions to understand the user’s context.
 
-    response = llm.invoke(prompt)
+    Relevant memory:
+    {memory_text}
+
+    Current message:
+    User: {user_message}
+    Assistant:"""
+
+
+    response = llm.invoke(prompt.strip())
 
     # Save this interaction in the session
     add_message_to_session(session_id, f"User: {user_message}")
