@@ -1,7 +1,7 @@
-from app.services.memory_store import create_empty_faiss
-from app.services.chatbot import llm
 from typing import Dict, List
 from langchain_community.vectorstores import FAISS
+from app.services.memory_store import create_empty_faiss
+from app.services.llm_client import llm
 
 # Global dictionary for session memories
 session_memories: Dict[str, FAISS] = {}

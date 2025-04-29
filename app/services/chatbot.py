@@ -1,18 +1,10 @@
-from langchain_openai import ChatOpenAI
+from app.services.llm_client import llm
 from app.core.config import settings
 from app.services.session_memory import (
     add_message_to_session, 
     get_relevant_session_memories,
     session_summaries,
     summarize_memory            
-)
-
-
-
-llm = ChatOpenAI(
-    model="gpt-3.5-turbo",
-    temperature=0.7,
-    openai_api_key=settings.OPENAI_API_KEY
 )
 
 def get_llm_response(session_id: str, user_message: str) -> str:
