@@ -1,9 +1,7 @@
 from langchain_openai import ChatOpenAI
 from app.core.config import settings
-from app.services.memory_store import load_memory, add_message_to_memory, get_relevant_memories
+from app.services.memory_store import add_message_to_session, get_relevant_session_memories
 
-# Load memory at startup
-load_memory()
 
 llm = ChatOpenAI(
     model="gpt-3.5-turbo",
@@ -11,17 +9,18 @@ llm = ChatOpenAI(
     openai_api_key=settings.OPENAI_API_KEY
 )
 
-def get_llm_response(message: str) -> str:
-    # Retrieve similar past memories
-    memories = get_relevant_memories(message)
+def get_llm_response(session_id: str, user_message: str) -> str:
+    # Get relevant memories for this session 
+    memories = get_relevant_session_memories(session_id, user_message)
 
-    # Build system prompt with past context and invoke
+    # Build prompt
     context = "\n".join(memories)
-    prompt = f"Past memories:\n{context}\n\nUser: {message}"
+    prompt = f"Past memories:\n{context}\n\nUser: {user_message}" 
+
     response = llm.invoke(prompt)
 
-    # Save this message and response to memory
-    add_message_to_memory(f"User: {message}")
-    add_message_to_memory(f"Assistant: {response.content}")
+    # Save this interaction in the session
+    add_message_to_session(session_id, f"User: {user_message}")
+    add_message_to_session(session_id, f"Assistant: {response.content}")
 
     return response.content
