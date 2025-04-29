@@ -1,6 +1,12 @@
 from langchain_openai import ChatOpenAI
 from app.core.config import settings
-from app.services.session_memory import add_message_to_session, get_relevant_session_memories
+from app.services.session_memory import (
+    add_message_to_session, 
+    get_relevant_session_memories,
+    session_summaries,
+    summarize_memory            
+)
+
 
 
 llm = ChatOpenAI(
@@ -10,15 +16,24 @@ llm = ChatOpenAI(
 )
 
 def get_llm_response(session_id: str, user_message: str) -> str:
-    # Get relevant memories for this session 
-    memories = get_relevant_session_memories(session_id, user_message)
-    memory_text = "\n".join(memories)
+    # Check if we need to summarize
+    if session_id not in session_summaries:
+        summarize_memory(session_id)
+    
+    # Get memory
+    summary = session_summaries.get(session_id, "")
+    recent_memories = get_relevant_session_memories(session_id, user_message)
+    memory_text = "\n".join(recent_memories)
+
 
     # Build prompt
     prompt = f"""
-    You are a helpful assistant. Use the following past interactions to understand the user’s context.
+    You are a helpful assistant. Use the following memory to respond.
 
-    Relevant memory:
+    Summary of past sessions:
+    {summary}
+
+    Recent interactions:
     {memory_text}
 
     Current message:
