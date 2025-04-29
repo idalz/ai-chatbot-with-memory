@@ -1,0 +1,114 @@
+<!-- app/templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Chatbot with Memory</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="chat-container">
+    <h1>AI Chatbot with Memory</h1>
+    <div id="chat-box"></div>
+
+    <div class="input-row">
+      <input type="text" id="user-input" placeholder="Type your message..." onkeydown="handleKey(event)" />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const session_id = sessionStorage.getItem("session_id") || crypto.randomUUID();
+    sessionStorage.setItem("session_id", session_id);
+
+    async function sendMessage() {
+      console.log("Sending message");
+      const input = document.getElementById("user-input");
+      const sendButton = document.querySelector(".input-row button");
+
+      const message = input.value.trim();
+      if (!message) return;
+
+      displayMessage("user", message);
+      input.value = "";
+
+      // Disable send button and show typing
+      sendButton.disabled = true;
+      sendButton.textContent = "Typing...";
+      showTypingIndicator();
+
+      try {
+        const response = await fetch("/api/v1/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id, message })
+        });
+
+        const data = await response.json();
+
+        hideTypingIndicator();
+        displayAnimatedMessage("assistant", data.response);
+      } catch (error) {
+        console.error("Error sending message:", error);
+        hideTypingIndicator();
+        displayMessage("assistant", "⚠️ Sorry, something went wrong!");
+      } finally {
+        sendButton.disabled = false;
+        sendButton.textContent = "Send";
+      }
+    }
+
+    function displayMessage(sender, text) {
+      const chatBox = document.getElementById("chat-box");
+      const msg = document.createElement("div");
+      msg.className = `message ${sender}`;
+      msg.textContent = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function displayAnimatedMessage(sender, text) {
+      const chatBox = document.getElementById("chat-box");
+      const msg = document.createElement("div");
+      msg.className = `message ${sender}`;
+      chatBox.appendChild(msg);
+
+      let i = 0;
+      const interval = setInterval(() => {
+        msg.textContent += text[i];
+        chatBox.scrollTop = chatBox.scrollHeight;
+        i++;
+        if (i >= text.length) clearInterval(interval);
+      }, 15);
+    }
+
+    function showTypingIndicator() {
+      const chatBox = document.getElementById("chat-box");
+
+      const existing = document.getElementById("typing-indicator");
+      if (existing) existing.remove();
+
+      const typing = document.createElement("div");
+      typing.className = "message assistant";
+      typing.id = "typing-indicator";
+      typing.textContent = "Bot is typing...";
+      chatBox.appendChild(typing);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function hideTypingIndicator() {
+      const typing = document.getElementById("typing-indicator");
+      if (typing) typing.remove();
+    }
+
+    function handleKey(event) {
+      const sendButton = document.querySelector(".input-row button");
+      if (event.key === "Enter" && !sendButton.disabled) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+  </script>
+</body>
+</html>
