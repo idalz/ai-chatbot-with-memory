@@ -1,5 +1,3 @@
-import os
-import pickle
 from typing import Dict
 
 from langchain_community.vectorstores import FAISS

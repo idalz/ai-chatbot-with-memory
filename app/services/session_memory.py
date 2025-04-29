@@ -1,4 +1,4 @@
-from app.services.memory_store import load_memory, save_memory, create_empty_faiss
+from app.services.memory_store import create_empty_faiss
 from typing import Dict, List
 from langchain_community.vectorstores import FAISS
 
