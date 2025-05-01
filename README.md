@@ -15,7 +15,7 @@ A session-aware AI chatbot using **FastAPI**, **OpenAI**, **LangChain** and **FA
 ## Features
 
 - **LLM-Powered Conversations** using OpenAI's GPT (via Langchain)  
-- **Vector-Based Memory with FAISS** that retrieves the most relevant messages using semantic similarity (RAG-style)
+- **Vector-Based Memory with FAISS** that retrieves the most relevant messages using semantic similarity.
 - **Session-Based Chat Tracking** so multiple users have their own conversations
 - **Memory Summarization (LLM-powered)** so the assistant automatically generates summaries of past interactions to preserve memory and reduce token usage.
 - Modern Dark-Themed UI with animated typewriter-style assistant replies
