@@ -1,7 +1,6 @@
 # AI Chatbot with Memory
 
-AI Chatbot with Memory is a full-stack application built with **FastAPI**, **OpenAI**, **LangChain** and **FAISS**.
-Each user is assigned a unique session ID, enabling personalized and memory-aware conversations that persist across messages during the session.
+A session-aware AI chatbot using **FastAPI**, **OpenAI**, **LangChain** and **FAISS** to deliver contextual and persistent conversations. Features include vector-based memory retrieval, LLM-powered summarization, and a modern interactive frontend.  
  
 ---
 ## Contents
@@ -82,4 +81,4 @@ The application will run at http://localhost:8000
 ---
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](LICENSE).
